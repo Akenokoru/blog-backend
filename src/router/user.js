@@ -17,6 +17,10 @@ const handleUserRouter = (req, res)  => {
     const result = login(username, password)
     return result.then(data => {
       if (data.username) {
+        // set session
+        req.session.username = data.username
+        req.session.realname = data.realname
+        console.log('req.session', req.session)
         // set cookie
         res.setHeader('Set-Cookie',`username=${data.username}; path=/; httpOnly; expires= ${getCookieExpires()}`)
         return new SuccessModel()
@@ -27,9 +31,9 @@ const handleUserRouter = (req, res)  => {
 
   // login test
   if (method === 'GET' && req.path === '/api/user/login-test') {
-    if (req.cookie.username) {
+    if (req.session.username) {
       return Promise.resolve(new SuccessModel({
-        username: req.cookie.username
+        session: req.session
       }))
     }
     return Promise.resolve(new ErrorModel('尚未登录'))
